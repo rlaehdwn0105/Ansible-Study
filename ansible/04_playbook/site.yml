@@ -1,0 +1,40 @@
+---
+- name: Install and start Apache HTTPD 
+  hosts: webservers
+  tasks:
+    # (ㄱ) 패키지 설치
+    # (ㄴ) 서비스 설정
+    # (ㄷ) 서비스 기동 
+    # (ㄹ) 방화벽 등록 
+
+    # (ㄱ) 패키지 설치
+    # yum install htppd mod_ssl
+    - name: Install the packages - httpd
+      yum: 
+        name: httpd
+        state: latest
+
+    # (ㄴ) 서비스 설정 ansible-playbook site.yml
+    # files/index.html -> web#: /var/www/html/index.html
+    - name: Copy file from files/index.html to /var/www/html/index.html
+      copy: 
+        src: files/index.html
+        dest: /var/www/html/index.html
+    # (ㄷ) 서비스기동 
+    # systemctl enable --now httpd 
+    - name: Enalbe or Start the service - httpd.service
+      service: 
+        name: httpd
+        state: started
+        enabled: yes
+    # (ㄹ) 방화벽 등록 
+    # firewall-cmd --permanent --add-service=http 
+    # firewall-cmd --reload
+    - name: Resister with firewall service - httpd 
+      firewalld: 
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+     
+    # (ㅁ) SELinux 설정 

@@ -1,0 +1,15 @@
+---
+- name: 잡 스케줄링  /etc/cron.d
+  hosts: test
+  remote_user: ansible 
+  become: false
+  gather_facts: no 
+  tasks:
+    - name: 정기적인 작업 수행 
+      cron:
+        name: datejob
+        minute: "0,30"
+        weekday: "1-5"
+        job: "date >> /home/ansible/datefile"
+
+

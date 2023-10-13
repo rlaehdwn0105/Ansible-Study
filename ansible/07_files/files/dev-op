@@ -1,0 +1,3 @@
+developer        ALL=(ALL)       NOPASSWD: ALL
+operator        ALL=(ALL)       NOPASSWD: ALL
+                                                     

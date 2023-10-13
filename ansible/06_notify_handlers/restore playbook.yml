@@ -1,0 +1,10 @@
+---
+- name: Rstore playbook.yml
+  hosts: databases
+  tasks: 
+    - name: MariaDB 패키지 삭제 
+      yum: 
+        name: 
+          - mariadb-server 
+          - python3-PyMySQL 
+        state: absent 

@@ -1,0 +1,27 @@
+- name: Restore the web server
+  hosts: web1.example.com 
+  tasks: 
+    # (ㄱ) 방화벽에 서비스 제거(http, https)
+    - name: Close the server ports - http, https 
+      firewalld: 
+        service: "{{ item }}"
+        permanent: yes
+        state: disabled 
+        immediate: yes 
+      loop: 
+        - http 
+        - https 
+
+    # (ㄴ) 파일 삭제(/var/html/index.html) 
+    - name: Remove a file - /var/www/html/index.html 
+      file: 
+        path: /var/www/html/index.html 
+        state: absent 
+
+    # (ㄷ) 패키지 삭제 
+    - name: Remove the packages -gttpd, mod_ssl 
+      yum: 
+        name: 
+          - httpd 
+          - mod_ssl 
+        state: absent 

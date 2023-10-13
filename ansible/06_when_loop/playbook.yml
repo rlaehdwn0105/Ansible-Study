@@ -1,0 +1,26 @@
+---
+- name: DB 패키지 설치 및 기동 
+  # 패키지 설치 mariadb-server
+  # DB 서비스 기동 --now mariadb.service 
+  hosts: database_prod
+  vars:
+    mariadb_packages:
+      - mariadb-server
+      - python3-PyMySQL
+
+  tasks:
+   # 패키지 설치 mariadb-server
+    - name: MariaDB package are installed
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ mariadb_packages }}"
+      when: ansible_distribution == 'RedHat'
+    
+    # DB 서비스 기동 --now mariadb.service
+    - name: Start MariaDB service
+      service:
+        name: mariadb
+        state: started
+        enabled: true
+

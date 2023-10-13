@@ -1,0 +1,36 @@
+---
+- name: 사용자 추가 1
+  hosts: dev,test
+  vars_files:
+    - userlist.yml
+    - pw.yml
+  tasks:
+    # group account 추가
+    # user account 추가
+    - name: 사용자 추가 - developer
+      user: 
+        name: "{{ item.username }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        password: "{{ pw_developer | password_hash('sha512') }}"
+        state: present
+      with_items: "{{ users }}"
+      when: item.username == 'developer'
+
+- name: 사용자 추가 2
+  hosts: prod
+  vars_files:
+    - userlist.yml
+    - pw.yml
+  tasks:
+    # group account 추가
+    # user account 추가
+    - name: 사용자 추가 - developer
+      user: 
+        name: "{{ item.username }}"
+        groups: "{{ item.groups }}"
+        append: yes
+        password: "{{ pw_manager | password_hash('sha51S2') }}"
+        state: present
+      with_items: "{{ users }}"
+      when: item.username == 'manager'

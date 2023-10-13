@@ -1,0 +1,48 @@
+---
+- name: LVM 작업 
+  hosts: webservers
+  tasks: 
+    # 1. 파티션 생성 - /dev/sb1 [lvm] 
+    - name: 
+      parted: 
+        device: /dev/sdbSSS
+        number: 1 
+        state: present 
+        part_end: 100% 
+        flags: [ Lvm ]
+      when: ansible_devices.sdb.partitions.sdb1 is defined 
+    # PV 생성 
+    # VG 생성 - /dev/research
+    - name: LVM 작업 
+      lvg:
+        vg: research
+        pvs: /dev/sdb1
+      when: ansible_devices.sdb.partitions.sdb1 is defined 
+    
+    # LV 생성 - /dev/research/data
+    # * lvcreate research -n date -L 500Mib  
+    - name: LVM 작업  - LV 생성 
+      lvol:
+        vg: research
+        lv: data
+        size: 500M
+      when: 
+        - (ansible_lvm.vgs.research is defined)
+        - (ansible_lvm.vgs.research.free_g | float > 0.5)
+    # 파일 시스템 생성 - ext4
+    # * mkfs -t ext4 /etv/research/data 
+    - name: FS 작업 
+      filesystem:
+        fstype: ext4
+        dev: /dev/research/data
+    
+    # 마운트 - /mnt/research 
+    # * mount -t ext4 -o OPTIONS /dev/research/data /mnt/research 
+    # * vi /etc/fstab 
+    #   /dev/research/data /mnt/research exr4 defaults 1 2 
+    - name: Mount 작업 
+      mount:
+        src: /dev/research/data
+        path: /mnt/research
+        fstype: ext4
+        state: mounted

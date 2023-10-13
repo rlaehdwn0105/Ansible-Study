@@ -1,0 +1,53 @@
+---
+- name: FTP 서버 설정 
+  hosts: test
+  gather_facts: no 
+  vars: 
+    anonymous_enable: NO
+  tasks:
+    # 패키지 설치 - vsftpd,ftp 
+    - name: FTP 패키지 설치 
+      yum:
+        name:   
+          - vsftpd 
+          - ftp
+        state: present 
+    
+    # 서비스 설정 
+    # * /etc/vsftpd/vsftpd.conf 
+    # * /etc/vsftpd/{ftpuser,user_list}
+    - name: FTP 서비스 설정 - /etc/vsftpd/vsftpd.conf 
+      template: 
+        src: templates/vsftpd.conf.j2 
+        dest: /etc/vsftpd/vsftpd.conf 
+        owner: root 
+        group: root 
+        mode: '0600'
+      
+    - name: FTP 서비스 설정 - /etc/vsftpd/{ftpuser,user_list}
+      copy: 
+        src: "{{ item }}"
+        dest:  "/etc/vsftpd/"
+        owner: root 
+        group: root 
+        mode: '0600'
+      with_items: 
+        - files/ftpusers
+        - files/user_list 
+
+    # 서비스 기동 - vsftpd 
+    - name: 서비스 기동 
+      service: 
+        name: vsftpd 
+        state: started 
+        enabled: yes 
+
+    # 방화벽 서비스 등록 - ftp 
+    - name: 방화벽 등록 
+      firewalld:
+        service: ftp 
+        permanent: yes 
+        state: enabled 
+        immediate: yes 
+
+  

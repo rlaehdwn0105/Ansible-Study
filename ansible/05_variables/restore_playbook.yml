@@ -1,0 +1,33 @@
+---
+- name: Restore the web server 
+  hosts: all 
+  vars: 
+    pkg_web: httpd 
+    pkg_httpsweb: mod_ssl
+    pkg_python: python3-PyMySQL
+    file_webindex: /var/www/html/index.html
+    svc_web: httpd 
+    fw_http: http 
+    fw_https: https 
+  tasks: 
+    - name: Close the ports on firewall 
+      firewalld: 
+        service: "{{ item }}"
+        permanent: true 
+        state: disabled 
+        immediate: yes
+      loop: 
+        - "{{ fw_http }}"
+        - "{{ fw_https }}"
+    - name: 파일 삭제 
+      file: 
+        path: "{{ file_webindex }}"
+        state: absent 
+    - name: 패키지 삭제
+      yum: 
+        name: "{{ packages }}"
+      vars: 
+        packages: 
+          - "{{ pkg_web }}"
+          - "{{ pkg_httpsweb }}"
+          - "{{ pkg_python }}"

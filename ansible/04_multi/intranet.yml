@@ -1,0 +1,44 @@
+---
+- name: Configure the wabserver 
+  hosts: web1.example.com
+  tasks: 
+    # (ㄱ) 패키지 설치(httpd. mod_ssl)
+    # yum install httpd mod_ssl 
+    - name: Install the packages - httpd, mod_ssl
+      yum:
+        name: 
+          - httpd
+          - mod_ssl
+        state: present
+    # (ㄴ) 서비스 설정(/var/www/html/index.html)
+    - name: Create a file - /var/www/html/index.html
+      copy: 
+        content: '<h1> Test Web Server </h1>'
+        dest: /var/www/html/index.html
+    # (ㄷ) 서비스 기동(httpd.service) 
+    - name: Start the service - httpd
+      service: 
+        name: httpd 
+        state: started
+        enabled: yes
+    # (ㄹ) 방화벽 등록(http. https)
+    - name: Open the service - http, https
+      firewalld: 
+        service: "{{ item }}"
+        permanent: yes
+        state: enabled 
+        immediate: yes 
+      loop: 
+        - http 
+        - https 
+    # (ㅁ) SELinux 
+
+- name: Test internet web server 
+  hosts: localhost 
+  become: no 
+  tasks: 
+    - name: Connect to internet web server
+      uri: 
+        url: http://web1.example.com 
+        return_content: true 
+        status_code: 200

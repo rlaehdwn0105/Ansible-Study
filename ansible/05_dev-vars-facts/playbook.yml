@@ -1,0 +1,13 @@
+---
+- name: 패키지 설치 및 서비스 기동 
+  hosts: webserver 
+  tasks: 
+    - name: 패키지 설치 - {{ ansible_local.custom.general.pacakge }}
+      yum:
+        name: "{{ ansible_local.custom.general.package }}"
+        state: latest 
+    - name: 서비스 기동 - httpd 
+      service: 
+        name: "{{ ansible_local.custom.general.service }}"
+        state: "{{ ansible_local.custom.general.state }}"
+        enabled: yes 

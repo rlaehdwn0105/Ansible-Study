@@ -1,0 +1,11 @@
+---
+- hosts: localhost 
+  become: yes 
+  tasks:
+  - name: github 업로드 
+    git: 
+      repo: "{{ '/home/ansible/project' }}"
+      dest: "{{ '/' }}"
+
+
+

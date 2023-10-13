@@ -1,0 +1,13 @@
+---
+- name: 원격 호스트 사용자 정의 팩트 파일 배포
+  hosts: webserver 
+  tasks: 
+    - name: 디렉토리 생성 -/etc/ansible/facts.d 
+      file: 
+        path: /etc/ansible/facts.d
+        state: directory 
+        mode: '0755'
+    - name: 파일 복사 - /etc/ansible/facts.d/custon.fact
+      copy: 
+        src: custom.fact 
+        dest: /etc/ansible/facts.d/custom.fact     

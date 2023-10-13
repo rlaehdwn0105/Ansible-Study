@@ -1,0 +1,19 @@
+---
+- name: Restore factcheck.yml
+  hosts: all 
+  gather_facts: no 
+  tasks:
+    - name: 방화벽 포트 닫기 
+      firewalld: 
+        service: http
+        permanent: yes
+        state: disabled 
+        immediate: yes 
+    - name: 파일지우기 
+      file: 
+        path: /var/www/html/index.html
+        state: absent
+    - name: 패키지 삭제 
+      yum: 
+        name: httpd 
+        state: absent 

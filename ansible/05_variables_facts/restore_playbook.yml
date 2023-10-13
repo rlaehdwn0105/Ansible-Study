@@ -1,0 +1,30 @@
+- name: Restore playbook.yml 
+  hosts: all 
+  vars_files: 
+    - vars/ansible1_vars.yml 
+  tasks: 
+    - name: 방화벽 포트 닫기 
+      firewalld: 
+        service: "{{ item }}"
+        permanent: true 
+        state: disabled 
+        immediate: yes 
+      loop: 
+        - "{{ fw_http }}"
+        - "{{ fw_https }}"
+    - name: 파일 삭제 - /var/www/html/index.html 
+      file: 
+        path: "{{ dir_secret }}"
+        state: absent 
+    - name: 디렉토리 삭제  - /var/www/html/.htaccess 
+      file: 
+        path: "{{ file_htaccess_dest }}"
+        state: absent 
+    - name: 패키지 삭제 - httpd, mod_ssl 
+      yum:
+        name: "{{ packages }}"
+        state: absent 
+      vars: 
+        packages: 
+          - "{{ pkg_http }}"
+          - "{{ pkg_https }}"

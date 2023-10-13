@@ -1,0 +1,17 @@
+---
+- name: TUI Mode로 전환 
+  hosts: all
+  tasks: 
+    # systemctl set-default multi-user.target 
+    - name: (at boot) GUI -> TUI 전환
+      file: 
+        src: /user/lib/systemd/system/multi-user.target 
+        dest: /etc/systemd/system/default.target 
+        # src: /user/lib/systemd/system/graphical.target 
+        # dest: /etc/systemd/system/default.target         
+        state: link  
+    
+    # systemctl isolate multi-user.target 
+    - name: (concurrent) GUI ->TUI 전환 
+      command: systemctl isolate multi-user.target 
+      # command: systemctl isolate graphical.target 

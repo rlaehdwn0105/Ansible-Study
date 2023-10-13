@@ -1,0 +1,11 @@
+---
+- name: copy 모듈 예제 
+  hosts: all
+  tasks:
+    - name: 파일 전송 - /home/devops/users.txt
+      copy:
+        src: files/users.txt
+        dest: /home/devops/users.txt
+        owner: devops
+        group: devops
+        mode: '0660'

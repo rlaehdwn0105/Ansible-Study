@@ -1,0 +1,71 @@
+---
+- name: 하드웨어 정보 수집 
+  hosts: all
+  gather_facts: yes
+  tasks:
+    - name: hwreport.emtpy - 다운로드 
+      get_url:
+        url: http://192.168.10.10/hwreport.empty
+        dest: /root/hwreport.txt
+
+    - name: 1) 인벤토리 호스트 이름 
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^HOST'
+        line: "HOST={{ ansible_facts['hostname'] }}"
+        state: present
+
+    - name: 2) BIOS 버전 
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^BIOS'
+        line: "BIOS={{ ansible_facts['bios_version'] }}"
+        state: present
+
+    - name: 3) 총 메모리(MB)
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^MEMORY'
+        line: "MEMORY={{ ansible_facts['memtotal_mb'] }} MB"
+
+    - name: 4) /dev/sda 디스크 크기 
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDA_DISK'
+        line: |
+          {% if ansible_facts['devices']['sda'] is defined %}
+          SDA_DISK_SIZE={{ ansible_facts['devices']['sda']['size'] }}
+          {% else %}
+          SDA_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+
+    - name: 5) /dev/sdb 디스크 크기 
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDB_DISK'
+        line: |
+          {% if ansible_devices.sdb is defined %}
+          SDB_DISK_SIZE={{ ansible_devices.sdb.size }}
+          {% else %}
+          SDB_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+
+      - name: 6) disk size - /dev/sdc
+      lineinfile:
+        path: /root/hwreport.txt
+        regexp: '^SDC_DISK'
+        line: |
+          {% if ansible_facts['devices']['sdc'] is defined %}
+          SDC_DISK_SIZE={{ ansible_facts['devices']['sdc']['size'] }}
+          {% else %}
+          SDC_DISK_SIZE=NONE
+          {% endif %}
+        state: present
+
+    - name: 파일 디렉토리에 저장 - hwreport 
+      fetch:
+        src: /root/hwreport.txt
+        dest: hwreport
+
